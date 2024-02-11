@@ -6,7 +6,7 @@ variable "region" {
 
 variable "vpc_id" {
   description =  "VPC to use for testing. Default is AWS Default VPC"
-  default = "vpc-442aaf21"
+  default = "vpc-0d0368c34c6a3920d"
 }
 
 
