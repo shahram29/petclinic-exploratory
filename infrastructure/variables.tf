@@ -1,6 +1,6 @@
 variable "region" {
   description =  "Identifies AWS region to use"
-  default = "us-west-1"
+  default = "us-west-2"
 }
 
 
