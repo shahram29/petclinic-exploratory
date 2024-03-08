@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'GIT_REPO_URL', defaultValue: 'git@github.com:shahram29/petclinic-exploratory.git')
+        string(name: 'GIT_CREDENTIALS_ID', defaultValue: 'exploratory')
+        string(name: 'GIT_BRANCH', defaultValue: 'main')
+        string(name: 'PROJECT_NAME', defaultValue: 'petclinic-spring')
+        string(name: 'FILE_PROPERTIES', defaultValue: 'file.properties')
+        string(name: 'TERRAFORM_BIN_PATH', defaultValue: '/usr/local/bin/terraform')
+    }
+
     options {
         disableConcurrentBuilds()
     }
@@ -8,24 +17,21 @@ pipeline {
     environment {
         amiNameTagValue = ''
         thisTestNameVar = ''
-        thisTestValue = 'exploratory-testing'
-        ProjectName = 'petclinic-spring'
-        fileProperties = 'file.properties'
     }
 
     stages {
         stage('Get Exploratory Testing Repo') {
             steps {
                 echo 'Getting Exploratory Testing Repo'
-                git(url: 'git@github.com:shahram29/petclinic-exploratory.git', credentialsId: 'exploratory', branch: 'main')
+                git(url: params.GIT_REPO_URL, credentialsId: params.GIT_CREDENTIALS_ID, branch: params.GIT_BRANCH)
             }
         }
 
         stage('Read Properties File') {
             steps {
                 script {
-                    copyArtifacts(projectName: "${ProjectName}")
-                    props = readProperties file: "${fileProperties}"
+                    copyArtifacts(projectName: params.PROJECT_NAME)
+                    props = readProperties file: params.FILE_PROPERTIES
 
                     this_group = props.Group
                     this_version = props.Version
@@ -51,16 +57,16 @@ pipeline {
                         
                         amiNameTagValue = "${this_artifact}-${this_jenkins_build_id}"
                         amiNameTag = "build_id=\"$amiNameTagValue\""
-                        thisTestNameVar = "test-name=\"$thisTestValue\""
+                        thisTestNameVar = "test-name=\"${params.THIS_TEST_VALUE}\""
 
                         def readContent = readFile 'terraform.tfvars'
                         writeFile file: 'terraform.tfvars', text: "$readContent\n$amiNameTag\n$thisTestNameVar"
 
                         sh 'pwd'
                         sh 'ls -l'
-                        sh '/usr/local/bin/terraform init -input=false'
-                        sh '/usr/local/bin/terraform plan'
-                        sh '/usr/local/bin/terraform apply -auto-approve'
+                        sh "${params.TERRAFORM_BIN_PATH} init -input=false"
+                        sh "${params.TERRAFORM_BIN_PATH} plan"
+                        sh "${params.TERRAFORM_BIN_PATH} apply -auto-approve"
                     }
                 }
             }
@@ -82,7 +88,7 @@ pipeline {
                 dir('./infrastructure') {
                     script {
                         echo 'Test completed, destroying environment'
-                        sh '/usr/local/bin/terraform destroy -auto-approve'
+                        sh "${params.TERRAFORM_BIN_PATH} destroy -auto-approve"
                     }
                 }
             }
@@ -95,7 +101,7 @@ pipeline {
                 def summaryMessage = "Summary of Test Results:\n" +
                     "Exploratory Test: ${env.TEST_PASSED}\n" +
                     ".......................................\n" +
-                    "Build ${currentBuild.fullDisplayName} has finished. Result: ${currentBuild.currentResult}"
+                    "Build ${currentBuild.fullDisplayName} has finished.\n Result: ${currentBuild.currentResult}"
                 emailext subject: "Pipeline Status: ${currentBuild.currentResult}", 
                       body: summaryMessage,
                       to: "vaziri.sean@gmail.com,vaziri.sean@icloud.com",
