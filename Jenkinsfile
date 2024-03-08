@@ -88,4 +88,13 @@ pipeline {
             }
         }
     }
+
+    post {
+        always {
+            emailext subject: "Pipeline Status: ${currentBuild.currentResult}", 
+                      body: "Build ${currentBuild.fullDisplayName} has finished. Result: ${currentBuild.currentResult}",
+                      to: "svaziri@apple.com",
+                      replyTo: "jenkins-noreply@example.com"
+        }
+    }
 }
