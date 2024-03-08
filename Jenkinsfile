@@ -100,6 +100,7 @@ pipeline {
                       body: summaryMessage,
                       to: "vaziri.sean@gmail.com",
                       replyTo: "vaziri.sean@gmail.com"
+            }
         }
     }
 }
