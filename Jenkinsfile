@@ -94,11 +94,11 @@ pipeline {
             script {
                 def summaryMessage = "Summary of Test Results:\n" +
                     "Exploratory Test: ${env.TEST_PASSED}\n" +
-                    "Other relevant information..." +
+                    ".......................................\n" +
                     "Build ${currentBuild.fullDisplayName} has finished. Result: ${currentBuild.currentResult}"
                 emailext subject: "Pipeline Status: ${currentBuild.currentResult}", 
                       body: summaryMessage,
-                      to: "vaziri.sean@gmail.com",
+                      to: "vaziri.sean@gmail.com,vaziri.sean@icloud.com",
                       replyTo: "vaziri.sean@gmail.com"
             }
         }
