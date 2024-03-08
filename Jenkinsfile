@@ -23,17 +23,19 @@ pipeline {
 
         stage('Read Properties File') {
             steps {
-                copyArtifacts(projectName: "${ProjectName}")
-                props = readProperties file: "${fileProperties}"
+                script {
+                    copyArtifacts(projectName: "${ProjectName}")
+                    props = readProperties file: "${fileProperties}"
 
-                this_group = props.Group
-                this_version = props.Version
-                this_artifact = props.ArtifactId
-                this_full_build_id = props.FullBuildId
-                this_jenkins_build_id = props.JenkinsBuildId
+                    this_group = props.Group
+                    this_version = props.Version
+                    this_artifact = props.ArtifactId
+                    this_full_build_id = props.FullBuildId
+                    this_jenkins_build_id = props.JenkinsBuildId
 
-                ['this_group', 'this_version', 'this_artifact', 'this_full_build_id', 'this_jenkins_build_id'].each {
-                    sh "echo Finished setting $it = ${this."$it"}"
+                    ['this_group', 'this_version', 'this_artifact', 'this_full_build_id', 'this_jenkins_build_id'].each {
+                        sh "echo Finished setting $it = ${this."$it"}"
+                    }
                 }
             }
         }
@@ -83,15 +85,6 @@ pipeline {
                         sh '/usr/local/bin/terraform destroy -auto-approve'
                     }
                 }
-            }
-        }
-
-        stage('Email Notification') {
-            steps {
-                emailext subject: "Build ${env.BUILD_NUMBER} - ${env.JOB_NAME} - ${currentBuild.currentResult}",
-                          body: 'Build Result: ${currentBuild.currentResult}\n\nMore details at: ${env.BUILD_URL}',
-                          to: 'your-email@example.com',
-                          mimeType: 'text/plain'
             }
         }
     }
