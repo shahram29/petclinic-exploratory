@@ -71,7 +71,7 @@ pipeline {
                 echo 'Starting --- exploratory testing'
                 sh 'pwd'
                 script {
-                    env.TEST_PASSED = input message: 'Was the Exploratory Testing Successfully Completed?', parameters: [choice(name: 'Test Results', choices: 'YES\nNO', description: 'Please make a selection')]
+                    env.TEST_PASSED = input message: 'Was the Exploratory Testing Successfully Completed?', parameters: [choice(name: 'Test Results', choices: 'SUCCESSFULL\nUNSUCCESSFULL', description: 'Please make a selection')]
                 }
                 echo "Exploratory Test successfully completed: ${env.TEST_PASSED}"
             }
