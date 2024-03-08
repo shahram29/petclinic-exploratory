@@ -90,7 +90,7 @@ pipeline {
             steps {
                 emailext subject: "Build ${env.BUILD_NUMBER} - ${env.JOB_NAME} - ${currentBuild.currentResult}",
                           body: 'Build Result: ${currentBuild.currentResult}\n\nMore details at: ${env.BUILD_URL}',
-                          to: 'svaziri@apple.com',
+                          to: 'your-email@example.com',
                           mimeType: 'text/plain'
             }
         }
